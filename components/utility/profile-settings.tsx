@@ -6,8 +6,13 @@ import {
   PROFILE_USERNAME_MIN
 } from "@/db/limits"
 import { updateProfile } from "@/db/profile"
-import { uploadImage } from "@/db/storage/profile-images"
+import { uploadProfileImage } from "@/db/storage/profile-images"
+import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
+import { fetchOpenRouterModels } from "@/lib/models/fetch-models"
+import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
 import { supabase } from "@/lib/supabase/browser-client"
+import { cn } from "@/lib/utils"
+import { OpenRouterLLM } from "@/types"
 import {
   IconCircleCheckFilled,
   IconCircleXFilled,
@@ -16,11 +21,11 @@ import {
   IconLogout,
   IconUser
 } from "@tabler/icons-react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { FC, useCallback, useContext, useEffect, useRef, useState } from "react"
+import { FC, useCallback, useContext, useRef, useState } from "react"
 import { toast } from "sonner"
 import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
-import { Avatar, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
 import ImagePicker from "../ui/image-picker"
 import { Input } from "../ui/input"
@@ -35,17 +40,20 @@ import {
 } from "../ui/sheet"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
+import { WithTooltip } from "../ui/with-tooltip"
 import { ThemeSwitcher } from "./theme-switcher"
 
 interface ProfileSettingsProps {}
 
-import { exportLocalStorageAsJSON } from "@/lib/export-old-data"
-import { cn } from "@/lib/utils"
-import { VALID_KEYS } from "@/types/valid-keys"
-import { WithTooltip } from "../ui/with-tooltip"
-
 export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
-  const { profile, setProfile } = useContext(ChatbotUIContext)
+  const {
+    profile,
+    setProfile,
+    envKeyMap,
+    setAvailableHostedModels,
+    setAvailableOpenRouterModels,
+    availableOpenRouterModels
+  } = useContext(ChatbotUIContext)
 
   const router = useRouter()
 
@@ -101,6 +109,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [mistralAPIKey, setMistralAPIKey] = useState(
     profile?.mistral_api_key || ""
   )
+  const [groqAPIKey, setGroqAPIKey] = useState(profile?.groq_api_key || "")
   const [perplexityAPIKey, setPerplexityAPIKey] = useState(
     profile?.perplexity_api_key || ""
   )
@@ -108,67 +117,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [openrouterAPIKey, setOpenrouterAPIKey] = useState(
     profile?.openrouter_api_key || ""
   )
-
-  const [isEnvOpenai, setIsEnvOpenai] = useState(false)
-  const [isEnvAnthropic, setIsEnvAnthropic] = useState(false)
-  const [isEnvGoogleGemini, setIsEnvGoogleGemini] = useState(false)
-  const [isEnvMistral, setIsEnvMistral] = useState(false)
-  const [isEnvPerplexity, setIsEnvPerplexity] = useState(false)
-  const [isEnvAzureOpenai, setIsEnvAzureOpenai] = useState(false)
-  const [isEnvOpenrouter, setIsEnvOpenrouter] = useState(false)
-
-  useEffect(() => {
-    async function fetchKeys() {
-      const keys = Object.values(VALID_KEYS)
-
-      keys.forEach(async key => {
-        const response = await fetch("/api/retrieval/keys", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ key })
-        })
-
-        if (response.ok) {
-          const { isUsing } = (await response.json()) as {
-            isUsing: boolean
-          }
-
-          switch (key) {
-            case "OPENAI_API_KEY":
-              setIsEnvOpenai(isUsing)
-              break
-            case "ANTHROPIC_API_KEY":
-              setIsEnvAnthropic(isUsing)
-              break
-            case "GOOGLE_GEMINI_API_KEY":
-              setIsEnvGoogleGemini(isUsing)
-              break
-            case "MISTRAL_API_KEY":
-              setIsEnvMistral(isUsing)
-              break
-            case "PERPLEXITY_API_KEY":
-              setIsEnvPerplexity(isUsing)
-              break
-            case "AZURE_OPENAI_API_KEY":
-              setIsEnvAzureOpenai(isUsing)
-              break
-            case "OPENROUTER_API_KEY":
-              setIsEnvOpenrouter(isUsing)
-              break
-            default:
-              console.warn("Unhandled key type:", key)
-              break
-          }
-        } else {
-          console.error("Failed to fetch key status:", key)
-        }
-      })
-    }
-
-    fetchKeys()
-  }, [])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -183,7 +131,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     let profileImagePath = ""
 
     if (profileImageFile) {
-      const { path, url } = await uploadImage(profile, profileImageFile)
+      const { path, url } = await uploadProfileImage(profile, profileImageFile)
       profileImageUrl = url ?? profileImageUrl
       profileImagePath = path
     }
@@ -200,6 +148,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       anthropic_api_key: anthropicAPIKey,
       google_gemini_api_key: googleGeminiAPIKey,
       mistral_api_key: mistralAPIKey,
+      groq_api_key: groqAPIKey,
       perplexity_api_key: perplexityAPIKey,
       use_azure_openai: useAzureOpenai,
       azure_openai_api_key: azureOpenaiAPIKey,
@@ -210,9 +159,70 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       azure_openai_embeddings_id: azureEmbeddingsID,
       openrouter_api_key: openrouterAPIKey
     })
+
     setProfile(updatedProfile)
 
     toast.success("Profile updated!")
+
+    const providers = [
+      "openai",
+      "google",
+      "azure",
+      "anthropic",
+      "mistral",
+      "groq",
+      "perplexity",
+      "openrouter"
+    ]
+
+    providers.forEach(async provider => {
+      let providerKey: keyof typeof profile
+
+      if (provider === "google") {
+        providerKey = "google_gemini_api_key"
+      } else if (provider === "azure") {
+        providerKey = "azure_openai_api_key"
+      } else {
+        providerKey = `${provider}_api_key` as keyof typeof profile
+      }
+
+      const models = LLM_LIST_MAP[provider]
+      const envKeyActive = envKeyMap[provider]
+
+      if (!envKeyActive) {
+        const hasApiKey = !!updatedProfile[providerKey]
+
+        if (provider === "openrouter") {
+          if (hasApiKey && availableOpenRouterModels.length === 0) {
+            const openrouterModels: OpenRouterLLM[] =
+              await fetchOpenRouterModels()
+            setAvailableOpenRouterModels(prev => {
+              const newModels = openrouterModels.filter(
+                model =>
+                  !prev.some(prevModel => prevModel.modelId === model.modelId)
+              )
+              return [...prev, ...newModels]
+            })
+          } else {
+            setAvailableOpenRouterModels([])
+          }
+        } else {
+          if (hasApiKey && Array.isArray(models)) {
+            setAvailableHostedModels(prev => {
+              const newModels = models.filter(
+                model =>
+                  !prev.some(prevModel => prevModel.modelId === model.modelId)
+              )
+              return [...prev, ...newModels]
+            })
+          } else if (!hasApiKey && Array.isArray(models)) {
+            setAvailableHostedModels(prev =>
+              prev.filter(model => !models.includes(model))
+            )
+          }
+        }
+      }
+    })
 
     setIsOpen(false)
   }
@@ -287,9 +297,13 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         {profile.image_url ? (
-          <Avatar className="mt-2 size-[34px] cursor-pointer hover:opacity-50">
-            <AvatarImage src={profile.image_url} />
-          </Avatar>
+          <Image
+            className="mt-2 size-[34px] cursor-pointer rounded hover:opacity-50"
+            src={profile.image_url + "?" + new Date().getTime()}
+            height={34}
+            width={34}
+            alt={"Image"}
+          />
         ) : (
           <Button size="icon" variant="ghost">
             <IconUser size={SIDEBAR_ICON_SIZE} />
@@ -302,7 +316,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
         side="left"
         onKeyDown={handleKeyDown}
       >
-        <div className="grow">
+        <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center justify-between space-x-2">
               <div>User Settings</div>
@@ -379,8 +393,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 <ImagePicker
                   src={profileImageSrc}
                   image={profileImageFile}
-                  height={100}
-                  width={100}
+                  height={50}
+                  width={50}
                   onSrcChange={setProfileImageSrc}
                   onImageChange={setProfileImageFile}
                 />
@@ -422,32 +436,32 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               <div className="mt-5 space-y-2">
                 <Label className="flex items-center">
                   {useAzureOpenai
-                    ? isEnvAzureOpenai
+                    ? envKeyMap["azure"]
                       ? ""
                       : "Azure OpenAI API Key"
-                    : isEnvOpenai
+                    : envKeyMap["openai"]
                       ? ""
                       : "OpenAI API Key"}
 
                   <Button
                     className={cn(
-                      "h-[18px] w-[130px] text-[11px]",
-                      (useAzureOpenai && !isEnvAzureOpenai) ||
-                        (!useAzureOpenai && !isEnvOpenai)
+                      "h-[18px] w-[150px] text-[11px]",
+                      (useAzureOpenai && !envKeyMap["azure"]) ||
+                        (!useAzureOpenai && !envKeyMap["openai"])
                         ? "ml-3"
                         : "mb-3"
                     )}
                     onClick={() => setUseAzureOpenai(!useAzureOpenai)}
                   >
                     {useAzureOpenai
-                      ? "Use Standard OpenAI"
-                      : "Use Azure OpenAI"}
+                      ? "Switch To Standard OpenAI"
+                      : "Switch To Azure OpenAI"}
                   </Button>
                 </Label>
 
                 {useAzureOpenai ? (
                   <>
-                    {isEnvAzureOpenai ? (
+                    {envKeyMap["azure"] ? (
                       <Label>Azure OpenAI API key set by admin.</Label>
                     ) : (
                       <Input
@@ -460,7 +474,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   </>
                 ) : (
                   <>
-                    {isEnvOpenai ? (
+                    {envKeyMap["openai"] ? (
                       <Label>OpenAI API key set by admin.</Label>
                     ) : (
                       <Input
@@ -479,7 +493,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                   <>
                     {
                       <div className="space-y-1">
-                        {!!process.env.NEXT_PUBLIC_AZURE_OPENAI_ENDPOINT ? (
+                        {envKeyMap["azure_openai_endpoint"] ? (
                           <Label className="text-xs">
                             Azure endpoint set by admin.
                           </Label>
@@ -489,7 +503,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                             <Input
                               placeholder="https://your-endpoint.openai.azure.com"
-                              type="password"
                               value={azureOpenaiEndpoint}
                               onChange={e =>
                                 setAzureOpenaiEndpoint(e.target.value)
@@ -502,7 +515,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {!!process.env.NEXT_PUBLIC_AZURE_GPT_35_TURBO_ID ? (
+                        {envKeyMap["azure_gpt_35_turbo_name"] ? (
                           <Label className="text-xs">
                             Azure GPT-3.5 Turbo deployment name set by admin.
                           </Label>
@@ -511,8 +524,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                             <Label>Azure GPT-3.5 Turbo Deployment Name</Label>
 
                             <Input
-                              placeholder="Azure OpenAI GPT-3.5 Turbo Deployment Name"
-                              type="password"
+                              placeholder="Azure GPT-3.5 Turbo Deployment Name"
                               value={azureOpenai35TurboID}
                               onChange={e =>
                                 setAzureOpenai35TurboID(e.target.value)
@@ -525,7 +537,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {!!process.env.NEXT_PUBLIC_AZURE_GPT_45_TURBO_ID ? (
+                        {envKeyMap["azure_gpt_45_turbo_name"] ? (
                           <Label className="text-xs">
                             Azure GPT-4.5 Turbo deployment name set by admin.
                           </Label>
@@ -534,8 +546,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                             <Label>Azure GPT-4.5 Turbo Deployment Name</Label>
 
                             <Input
-                              placeholder="Azure OpenAI GPT-4.5 Turbo Deployment Name"
-                              type="password"
+                              placeholder="Azure GPT-4.5 Turbo Deployment Name"
                               value={azureOpenai45TurboID}
                               onChange={e =>
                                 setAzureOpenai45TurboID(e.target.value)
@@ -548,7 +559,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {!!process.env.NEXT_PUBLIC_AZURE_GPT_45_VISION_ID ? (
+                        {envKeyMap["azure_gpt_45_vision_name"] ? (
                           <Label className="text-xs">
                             Azure GPT-4.5 Vision deployment name set by admin.
                           </Label>
@@ -557,8 +568,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                             <Label>Azure GPT-4.5 Vision Deployment Name</Label>
 
                             <Input
-                              placeholder="Azure OpenAI GPT-4.5 Vision Deployment Name"
-                              type="password"
+                              placeholder="Azure GPT-4.5 Vision Deployment Name"
                               value={azureOpenai45VisionID}
                               onChange={e =>
                                 setAzureOpenai45VisionID(e.target.value)
@@ -571,7 +581,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
                     {
                       <div className="space-y-1">
-                        {!!process.env.NEXT_PUBLIC_AZURE_EMBEDDINGS_ID ? (
+                        {envKeyMap["azure_embeddings_name"] ? (
                           <Label className="text-xs">
                             Azure Embeddings deployment name set by admin.
                           </Label>
@@ -580,8 +590,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                             <Label>Azure Embeddings Deployment Name</Label>
 
                             <Input
-                              placeholder="Azure OpenAI Embeddings Deployment Name"
-                              type="password"
+                              placeholder="Azure Embeddings Deployment Name"
                               value={azureEmbeddingsID}
                               onChange={e =>
                                 setAzureEmbeddingsID(e.target.value)
@@ -595,7 +604,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 ) : (
                   <>
                     <div className="space-y-1">
-                      {!!process.env.NEXT_PUBLIC_OPENAI_ORGANIZATION_ID ? (
+                      {envKeyMap["openai_organization_id"] ? (
                         <Label className="text-xs">
                           OpenAI Organization ID set by admin.
                         </Label>
@@ -620,7 +629,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvAnthropic ? (
+                {envKeyMap["anthropic"] ? (
                   <Label>Anthropic API key set by admin.</Label>
                 ) : (
                   <>
@@ -636,7 +645,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvGoogleGemini ? (
+                {envKeyMap["google"] ? (
                   <Label>Google Gemini API key set by admin.</Label>
                 ) : (
                   <>
@@ -652,7 +661,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvMistral ? (
+                {envKeyMap["mistral"] ? (
                   <Label>Mistral API key set by admin.</Label>
                 ) : (
                   <>
@@ -668,7 +677,23 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvPerplexity ? (
+                {envKeyMap["groq"] ? (
+                  <Label>Groq API key set by admin.</Label>
+                ) : (
+                  <>
+                    <Label>Groq API Key</Label>
+                    <Input
+                      placeholder="Groq API Key"
+                      type="password"
+                      value={groqAPIKey}
+                      onChange={e => setGroqAPIKey(e.target.value)}
+                    />
+                  </>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                {envKeyMap["perplexity"] ? (
                   <Label>Perplexity API key set by admin.</Label>
                 ) : (
                   <>
@@ -684,7 +709,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
 
               <div className="space-y-1">
-                {isEnvOpenrouter ? (
+                {envKeyMap["openrouter"] ? (
                   <Label>OpenRouter API key set by admin.</Label>
                 ) : (
                   <>

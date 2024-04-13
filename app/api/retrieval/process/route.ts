@@ -24,13 +24,39 @@ export async function POST(req: Request) {
 
     const formData = await req.formData()
 
-    const file = formData.get("file") as File
     const file_id = formData.get("file_id") as string
     const embeddingsProvider = formData.get("embeddingsProvider") as string
 
+    const { data: fileMetadata, error: metadataError } = await supabaseAdmin
+      .from("files")
+      .select("*")
+      .eq("id", file_id)
+      .single()
+
+    if (metadataError) {
+      throw new Error(
+        `Failed to retrieve file metadata: ${metadataError.message}`
+      )
+    }
+
+    if (!fileMetadata) {
+      throw new Error("File not found")
+    }
+
+    if (fileMetadata.user_id !== profile.user_id) {
+      throw new Error("Unauthorized")
+    }
+
+    const { data: file, error: fileError } = await supabaseAdmin.storage
+      .from("files")
+      .download(fileMetadata.file_path)
+
+    if (fileError)
+      throw new Error(`Failed to retrieve file: ${fileError.message}`)
+
     const fileBuffer = Buffer.from(await file.arrayBuffer())
     const blob = new Blob([fileBuffer])
-    const fileExtension = file.name.split(".").pop()?.toLowerCase()
+    const fileExtension = fileMetadata.name.split(".").pop()?.toLowerCase()
 
     if (embeddingsProvider === "openai") {
       if (profile.use_azure_openai) {
@@ -71,7 +97,7 @@ export async function POST(req: Request) {
       openai = new OpenAI({
         apiKey: profile.azure_openai_api_key || "",
         baseURL: `${profile.azure_openai_endpoint}/openai/deployments/${profile.azure_openai_embeddings_id}`,
-        defaultQuery: { "api-version": "2023-07-01-preview" },
+        defaultQuery: { "api-version": "2023-12-01-preview" },
         defaultHeaders: { "api-key": profile.azure_openai_api_key }
       })
     } else {
@@ -83,7 +109,7 @@ export async function POST(req: Request) {
 
     if (embeddingsProvider === "openai") {
       const response = await openai.embeddings.create({
-        model: "text-embedding-ada-002",
+        model: "text-embedding-3-small",
         input: chunks.map(chunk => chunk.content)
       })
 
