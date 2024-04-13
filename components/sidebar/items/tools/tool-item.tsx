@@ -2,7 +2,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
-import { validateOpenAPI } from "@/lib/openapi-conversion"
 import { Tables } from "@/supabase/types"
 import { IconBolt } from "@tabler/icons-react"
 import { FC, useState } from "react"
@@ -17,11 +16,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(tool.description)
   const [url, setUrl] = useState(tool.url)
-  const [customHeaders, setCustomHeaders] = useState(
-    tool.custom_headers as string
-  )
   const [schema, setSchema] = useState(tool.schema as string)
-  const [schemaError, setSchemaError] = useState("")
 
   return (
     <SidebarItem
@@ -29,13 +24,7 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
       isTyping={isTyping}
       contentType="tools"
       icon={<IconBolt size={30} />}
-      updateState={{
-        name,
-        description,
-        url,
-        custom_headers: customHeaders,
-        schema
-      }}
+      updateState={{ name, description, url, schema }}
       renderInputs={() => (
         <>
           <div className="space-y-1">
@@ -91,17 +80,6 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
           </div> */}
 
           <div className="space-y-1">
-            <Label>Custom Headers</Label>
-
-            <TextareaAutosize
-              placeholder={`{"X-api-key": "1234567890"}`}
-              value={customHeaders}
-              onValueChange={setCustomHeaders}
-              minRows={1}
-            />
-          </div>
-
-          <div className="space-y-1">
             <Label>Schema</Label>
 
             <TextareaAutosize
@@ -142,22 +120,9 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
                 }
               }`}
               value={schema}
-              onValueChange={value => {
-                setSchema(value)
-
-                try {
-                  const parsedSchema = JSON.parse(value)
-                  validateOpenAPI(parsedSchema)
-                    .then(() => setSchemaError("")) // Clear error if validation is successful
-                    .catch(error => setSchemaError(error.message)) // Set specific validation error message
-                } catch (error) {
-                  setSchemaError("Invalid JSON format") // Set error for invalid JSON format
-                }
-              }}
-              minRows={15}
+              onValueChange={setSchema}
+              minRows={20}
             />
-
-            <div className="text-xs text-red-500">{schemaError}</div>
           </div>
         </>
       )}

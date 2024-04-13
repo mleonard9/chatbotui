@@ -8,7 +8,7 @@ export const getChatFilesByChatId = async (chatId: string) => {
       `
       id, 
       name, 
-      files (*)
+      files ( id, name, type )
     `
     )
     .eq("id", chatId)

@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
-import { ContentType } from "@/types"
 import { IconChevronDown, IconChevronRight } from "@tabler/icons-react"
 import { FC, useRef, useState } from "react"
 import { DeleteFolder } from "./delete-folder"
@@ -8,14 +7,12 @@ import { UpdateFolder } from "./update-folder"
 
 interface FolderProps {
   folder: Tables<"folders">
-  contentType: ContentType
   children: React.ReactNode
   onUpdateFolder: (itemId: string, folderId: string | null) => void
 }
 
 export const Folder: FC<FolderProps> = ({
   folder,
-  contentType,
   children,
   onUpdateFolder
 }) => {
@@ -100,7 +97,7 @@ export const Folder: FC<FolderProps> = ({
             >
               <UpdateFolder folder={folder} />
 
-              <DeleteFolder folder={folder} contentType={contentType} />
+              <DeleteFolder folder={folder} />
             </div>
           )}
         </div>

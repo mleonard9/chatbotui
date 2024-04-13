@@ -1,9 +1,8 @@
 import Loading from "@/app/[locale]/loading"
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
-import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
-import { getChatFilesByChatId } from "@/db/chat-files"
 import { getChatById } from "@/db/chats"
+import { getFileById } from "@/db/files"
 import { getMessageFileItemsByMessageId } from "@/db/message-file-items"
 import { getMessagesByChatId } from "@/db/messages"
 import { getMessageImageFromStorage } from "@/db/storage/message-images"
@@ -37,8 +36,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     setChatFileItems,
     setChatFiles,
     setShowFilesDisplay,
-    setUseRetrieval,
-    setSelectedTools
+    setUseRetrieval
   } = useContext(ChatbotUIContext)
 
   const { handleNewChat, handleFocusChatInput } = useChatHandler()
@@ -122,19 +120,33 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
     const uniqueFileItems = messageFileItems.flatMap(item => item.file_items)
     setChatFileItems(uniqueFileItems)
 
-    const chatFiles = await getChatFilesByChatId(params.chatid as string)
+    const uniqueFileIds = [
+      ...new Set(uniqueFileItems.map(item => item.file_id))
+    ]
 
-    setChatFiles(
-      chatFiles.files.map(file => ({
-        id: file.id,
-        name: file.name,
-        type: file.type,
-        file: null
-      }))
-    )
+    if (uniqueFileIds.length > 0) {
+      const fileFetchPromises = uniqueFileIds.map(async fileId => {
+        const file = await getFileById(fileId)
+        return file
+      })
 
-    setUseRetrieval(true)
-    setShowFilesDisplay(true)
+      const files = await Promise.all(fileFetchPromises)
+      setChatFiles(
+        files.map(file => ({
+          id: file.id,
+          name: file.name,
+          type: file.type,
+          file: null
+        }))
+      )
+
+      setUseRetrieval(true)
+      setShowFilesDisplay(true)
+    } else {
+      setUseRetrieval(false)
+      setShowFilesDisplay(false)
+      setChatFiles([])
+    }
 
     const fetchedChatMessages = fetchedMessages.map(message => {
       return {
@@ -161,11 +173,6 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
 
       if (assistant) {
         setSelectedAssistant(assistant)
-
-        const assistantTools = (
-          await getAssistantToolsByAssistantId(assistant.id)
-        ).tools
-        setSelectedTools(assistantTools)
       }
     }
 
@@ -201,8 +208,8 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <ChatSecondaryButtons />
       </div>
 
-      <div className="bg-secondary flex max-h-[50px] min-h-[50px] w-full items-center justify-center border-b-2 font-bold">
-        <div className="max-w-[200px] truncate sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[700px]">
+      <div className="bg-secondary flex max-h-[50px] min-h-[50px] w-full items-center justify-center border-b-2 px-20 font-bold">
+        <div className="max-w-[300px] truncate sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] xl:max-w-[700px]">
           {selectedChat?.name || "Chat"}
         </div>
       </div>
@@ -218,7 +225,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="relative w-full min-w-[300px] items-end px-2 pb-3 pt-0 sm:w-[600px] sm:pb-8 sm:pt-5 md:w-[700px] lg:w-[700px] xl:w-[800px]">
+      <div className="relative w-[300px] items-end pb-8 pt-5 sm:w-[400px] md:w-[500px] lg:w-[660px] xl:w-[800px]">
         <ChatInput />
       </div>
 

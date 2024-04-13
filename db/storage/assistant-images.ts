@@ -13,18 +13,7 @@ export const uploadAssistantImage = async (
     throw new Error(`Image must be less than ${imageSizeLimit / 1000000}MB`)
   }
 
-  const currentPath = assistant.image_path
-  let filePath = `${assistant.user_id}/${assistant.id}/${Date.now()}`
-
-  if (currentPath.length > 0) {
-    const { error: deleteError } = await supabase.storage
-      .from(bucket)
-      .remove([currentPath])
-
-    if (deleteError) {
-      throw new Error("Error deleting old image")
-    }
-  }
+  let filePath = `${assistant.user_id}/${assistant.id}`
 
   const { error } = await supabase.storage
     .from(bucket)

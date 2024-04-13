@@ -13,7 +13,6 @@ import { deleteAssistant } from "@/db/assistants"
 import { deleteChat } from "@/db/chats"
 import { deleteCollection } from "@/db/collections"
 import { deleteFile } from "@/db/files"
-import { deleteModel } from "@/db/models"
 import { deletePreset } from "@/db/presets"
 import { deletePrompt } from "@/db/prompts"
 import { deleteFileFromStorage } from "@/db/storage/files"
@@ -38,8 +37,7 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     setFiles,
     setCollections,
     setAssistants,
-    setTools,
-    setModels
+    setTools
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -71,9 +69,6 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     },
     tools: async (tool: Tables<"tools">) => {
       await deleteTool(tool.id)
-    },
-    models: async (model: Tables<"models">) => {
-      await deleteModel(model.id)
     }
   }
 
@@ -84,8 +79,7 @@ export const SidebarDeleteItem: FC<SidebarDeleteItemProps> = ({
     files: setFiles,
     collections: setCollections,
     assistants: setAssistants,
-    tools: setTools,
-    models: setModels
+    tools: setTools
   }
 
   const handleDelete = async () => {

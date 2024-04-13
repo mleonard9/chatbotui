@@ -10,93 +10,39 @@ import {
 } from "@/components/ui/dialog"
 import { ChatbotUIContext } from "@/context/context"
 import { deleteFolder } from "@/db/folders"
-import { supabase } from "@/lib/supabase/browser-client"
 import { Tables } from "@/supabase/types"
-import { ContentType } from "@/types"
 import { IconTrash } from "@tabler/icons-react"
 import { FC, useContext, useRef, useState } from "react"
-import { toast } from "sonner"
 
 interface DeleteFolderProps {
   folder: Tables<"folders">
-  contentType: ContentType
 }
 
-export const DeleteFolder: FC<DeleteFolderProps> = ({
-  folder,
-  contentType
-}) => {
-  const {
-    setChats,
-    setFolders,
-    setPresets,
-    setPrompts,
-    setFiles,
-    setCollections,
-    setAssistants,
-    setTools,
-    setModels
-  } = useContext(ChatbotUIContext)
+export const DeleteFolder: FC<DeleteFolderProps> = ({ folder }) => {
+  const { setFolders, setChats } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const [showFolderDialog, setShowFolderDialog] = useState(false)
 
-  const stateUpdateFunctions = {
-    chats: setChats,
-    presets: setPresets,
-    prompts: setPrompts,
-    files: setFiles,
-    collections: setCollections,
-    assistants: setAssistants,
-    tools: setTools,
-    models: setModels
-  }
-
-  const handleDeleteFolderOnly = async () => {
+  const handleDeleteFolder = async () => {
     await deleteFolder(folder.id)
 
     setFolders(prevState => prevState.filter(c => c.id !== folder.id))
 
     setShowFolderDialog(false)
 
-    const setStateFunction = stateUpdateFunctions[contentType]
-
-    if (!setStateFunction) return
-
-    setStateFunction((prevItems: any) =>
-      prevItems.map((item: any) => {
-        if (item.folder_id === folder.id) {
-          return {
-            ...item,
-            folder_id: null
-          }
-        }
-
-        return item
-      })
+    setChats(prevState =>
+      prevState.map(c =>
+        c.folder_id === folder.id ? { ...c, folder_id: null } : c
+      )
     )
   }
 
-  const handleDeleteFolderAndItems = async () => {
-    const setStateFunction = stateUpdateFunctions[contentType]
-
-    if (!setStateFunction) return
-
-    const { error } = await supabase
-      .from(contentType)
-      .delete()
-      .eq("folder_id", folder.id)
-
-    if (error) {
-      toast.error(error.message)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter") {
+      buttonRef.current?.click()
     }
-
-    setStateFunction((prevItems: any) =>
-      prevItems.filter((item: any) => item.folder_id !== folder.id)
-    )
-
-    handleDeleteFolderOnly()
   }
 
   return (
@@ -105,7 +51,7 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
         <IconTrash className="hover:opacity-50" size={18} />
       </DialogTrigger>
 
-      <DialogContent className="min-w-[550px]">
+      <DialogContent onKeyDown={handleKeyDown}>
         <DialogHeader>
           <DialogTitle>Delete {folder.name}</DialogTitle>
 
@@ -122,17 +68,9 @@ export const DeleteFolder: FC<DeleteFolderProps> = ({
           <Button
             ref={buttonRef}
             variant="destructive"
-            onClick={handleDeleteFolderAndItems}
+            onClick={handleDeleteFolder}
           >
-            Delete Folder & Included Items
-          </Button>
-
-          <Button
-            ref={buttonRef}
-            variant="destructive"
-            onClick={handleDeleteFolderOnly}
-          >
-            Delete Folder Only
+            Delete
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -2,6 +2,7 @@
 
 import { ChatbotUIContext } from "@/context/context"
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { ChatSettings } from "@/types"
 import { IconInfoCircle } from "@tabler/icons-react"
 import { FC, useContext } from "react"
@@ -33,7 +34,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
   useAdvancedDropdown = true,
   showTooltip = true
 }) => {
-  const { profile, models } = useContext(ChatbotUIContext)
+  const { profile, availableLocalModels } = useContext(ChatbotUIContext)
 
   if (!profile) return null
 
@@ -43,6 +44,8 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
         <Label>Model</Label>
 
         <ModelSelect
+          hostedModelOptions={LLM_LIST}
+          localModelOptions={availableLocalModels}
           selectedModelId={chatSettings.model}
           onSelectModel={model => {
             onChangeChatSettings({ ...chatSettings, model })
@@ -97,12 +100,12 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
   onChangeChatSettings,
   showTooltip
 }) => {
-  const { profile, selectedWorkspace, availableOpenRouterModels, models } =
-    useContext(ChatbotUIContext)
-
-  const isCustomModel = models.some(
-    model => model.model_id === chatSettings.model
-  )
+  const {
+    profile,
+    selectedWorkspace,
+    availableOpenRouterModels,
+    selectedAssistant
+  } = useContext(ChatbotUIContext)
 
   function findOpenRouterModel(modelId: string) {
     return availableOpenRouterModels.find(model => model.modelId === modelId)
@@ -154,12 +157,7 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
             })
           }}
           min={0}
-          max={
-            isCustomModel
-              ? models.find(model => model.model_id === chatSettings.model)
-                  ?.context_length
-              : MODEL_LIMITS.MAX_CONTEXT_LENGTH
-          }
+          max={MODEL_LIMITS.MAX_CONTEXT_LENGTH - 200} // 200 is a minimum buffer for token output
           step={1}
         />
       </div>

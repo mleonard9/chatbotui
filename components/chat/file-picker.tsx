@@ -25,8 +25,7 @@ export const FilePicker: FC<FilePickerProps> = ({
   onSelectCollection,
   isFocused
 }) => {
-  const { files, collections, setIsFilePickerOpen } =
-    useContext(ChatbotUIContext)
+  const { files, collections, setIsAtPickerOpen } = useContext(ChatbotUIContext)
 
   const itemsRef = useRef<(HTMLDivElement | null)[]>([])
 
@@ -67,7 +66,7 @@ export const FilePicker: FC<FilePickerProps> = ({
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === "Escape") {
         e.preventDefault()
-        setIsFilePickerOpen(false)
+        setIsAtPickerOpen(false)
       } else if (e.key === "Backspace") {
         e.preventDefault()
       } else if (e.key === "Enter") {

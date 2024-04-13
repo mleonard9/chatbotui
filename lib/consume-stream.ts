@@ -17,7 +17,7 @@ export async function consumeReadableStream(
       }
 
       if (value) {
-        callback(decoder.decode(value, { stream: true }))
+        callback(decoder.decode(value))
       }
     }
   } catch (error) {

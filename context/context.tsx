@@ -5,11 +5,9 @@ import {
   ChatSettings,
   LLM,
   MessageImage,
-  OpenRouterLLM,
-  WorkspaceImage
+  OpenRouterLLM
 } from "@/types"
-import { AssistantImage } from "@/types/images/assistant-image"
-import { VALID_ENV_KEYS } from "@/types/valid-keys"
+import { AssistantImage } from "@/types/assistant-image"
 import { Dispatch, SetStateAction, createContext } from "react"
 
 interface ChatbotUIContext {
@@ -19,31 +17,25 @@ interface ChatbotUIContext {
 
   // ITEMS STORE
   assistants: Tables<"assistants">[]
-  setAssistants: Dispatch<SetStateAction<Tables<"assistants">[]>>
   collections: Tables<"collections">[]
-  setCollections: Dispatch<SetStateAction<Tables<"collections">[]>>
   chats: Tables<"chats">[]
-  setChats: Dispatch<SetStateAction<Tables<"chats">[]>>
   files: Tables<"files">[]
-  setFiles: Dispatch<SetStateAction<Tables<"files">[]>>
   folders: Tables<"folders">[]
-  setFolders: Dispatch<SetStateAction<Tables<"folders">[]>>
-  models: Tables<"models">[]
-  setModels: Dispatch<SetStateAction<Tables<"models">[]>>
   presets: Tables<"presets">[]
-  setPresets: Dispatch<SetStateAction<Tables<"presets">[]>>
   prompts: Tables<"prompts">[]
-  setPrompts: Dispatch<SetStateAction<Tables<"prompts">[]>>
   tools: Tables<"tools">[]
-  setTools: Dispatch<SetStateAction<Tables<"tools">[]>>
   workspaces: Tables<"workspaces">[]
+  setAssistants: Dispatch<SetStateAction<Tables<"assistants">[]>>
+  setCollections: Dispatch<SetStateAction<Tables<"collections">[]>>
+  setChats: Dispatch<SetStateAction<Tables<"chats">[]>>
+  setFiles: Dispatch<SetStateAction<Tables<"files">[]>>
+  setFolders: Dispatch<SetStateAction<Tables<"folders">[]>>
+  setPresets: Dispatch<SetStateAction<Tables<"presets">[]>>
+  setPrompts: Dispatch<SetStateAction<Tables<"prompts">[]>>
+  setTools: Dispatch<SetStateAction<Tables<"tools">[]>>
   setWorkspaces: Dispatch<SetStateAction<Tables<"workspaces">[]>>
 
   // MODELS STORE
-  envKeyMap: Record<string, VALID_ENV_KEYS>
-  setEnvKeyMap: Dispatch<SetStateAction<Record<string, VALID_ENV_KEYS>>>
-  availableHostedModels: LLM[]
-  setAvailableHostedModels: Dispatch<SetStateAction<LLM[]>>
   availableLocalModels: LLM[]
   setAvailableLocalModels: Dispatch<SetStateAction<LLM[]>>
   availableOpenRouterModels: OpenRouterLLM[]
@@ -52,8 +44,6 @@ interface ChatbotUIContext {
   // WORKSPACE STORE
   selectedWorkspace: Tables<"workspaces"> | null
   setSelectedWorkspace: Dispatch<SetStateAction<Tables<"workspaces"> | null>>
-  workspaceImages: WorkspaceImage[]
-  setWorkspaceImages: Dispatch<SetStateAction<WorkspaceImage[]>>
 
   // PRESET STORE
   selectedPreset: Tables<"presets"> | null
@@ -61,74 +51,68 @@ interface ChatbotUIContext {
 
   // ASSISTANT STORE
   selectedAssistant: Tables<"assistants"> | null
-  setSelectedAssistant: Dispatch<SetStateAction<Tables<"assistants"> | null>>
   assistantImages: AssistantImage[]
-  setAssistantImages: Dispatch<SetStateAction<AssistantImage[]>>
   openaiAssistants: any[]
+  setSelectedAssistant: Dispatch<SetStateAction<Tables<"assistants"> | null>>
+  setAssistantImages: Dispatch<SetStateAction<AssistantImage[]>>
   setOpenaiAssistants: Dispatch<SetStateAction<any[]>>
 
   // PASSIVE CHAT STORE
   userInput: string
-  setUserInput: Dispatch<SetStateAction<string>>
   chatMessages: ChatMessage[]
-  setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>
   chatSettings: ChatSettings | null
-  setChatSettings: Dispatch<SetStateAction<ChatSettings>>
   selectedChat: Tables<"chats"> | null
-  setSelectedChat: Dispatch<SetStateAction<Tables<"chats"> | null>>
   chatFileItems: Tables<"file_items">[]
+  setUserInput: Dispatch<SetStateAction<string>>
+  setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>
+  setChatSettings: Dispatch<SetStateAction<ChatSettings>>
+  setSelectedChat: Dispatch<SetStateAction<Tables<"chats"> | null>>
   setChatFileItems: Dispatch<SetStateAction<Tables<"file_items">[]>>
 
   // ACTIVE CHAT STORE
   abortController: AbortController | null
-  setAbortController: Dispatch<SetStateAction<AbortController | null>>
   firstTokenReceived: boolean
-  setFirstTokenReceived: Dispatch<SetStateAction<boolean>>
   isGenerating: boolean
+  setAbortController: Dispatch<SetStateAction<AbortController | null>>
+  setFirstTokenReceived: Dispatch<SetStateAction<boolean>>
   setIsGenerating: Dispatch<SetStateAction<boolean>>
 
   // CHAT INPUT COMMAND STORE
   isPromptPickerOpen: boolean
-  setIsPromptPickerOpen: Dispatch<SetStateAction<boolean>>
   slashCommand: string
-  setSlashCommand: Dispatch<SetStateAction<string>>
-  isFilePickerOpen: boolean
-  setIsFilePickerOpen: Dispatch<SetStateAction<boolean>>
-  hashtagCommand: string
-  setHashtagCommand: Dispatch<SetStateAction<string>>
-  isToolPickerOpen: boolean
-  setIsToolPickerOpen: Dispatch<SetStateAction<boolean>>
-  toolCommand: string
-  setToolCommand: Dispatch<SetStateAction<string>>
-  focusPrompt: boolean
-  setFocusPrompt: Dispatch<SetStateAction<boolean>>
-  focusFile: boolean
-  setFocusFile: Dispatch<SetStateAction<boolean>>
-  focusTool: boolean
-  setFocusTool: Dispatch<SetStateAction<boolean>>
-  focusAssistant: boolean
-  setFocusAssistant: Dispatch<SetStateAction<boolean>>
+  isAtPickerOpen: boolean
   atCommand: string
+  isToolPickerOpen: boolean
+  toolCommand: string
+  focusPrompt: boolean
+  focusFile: boolean
+  focusTool: boolean
+  setIsPromptPickerOpen: Dispatch<SetStateAction<boolean>>
+  setSlashCommand: Dispatch<SetStateAction<string>>
+  setIsAtPickerOpen: Dispatch<SetStateAction<boolean>>
   setAtCommand: Dispatch<SetStateAction<string>>
-  isAssistantPickerOpen: boolean
-  setIsAssistantPickerOpen: Dispatch<SetStateAction<boolean>>
+  setIsToolPickerOpen: Dispatch<SetStateAction<boolean>>
+  setToolCommand: Dispatch<SetStateAction<string>>
+  setFocusPrompt: Dispatch<SetStateAction<boolean>>
+  setFocusFile: Dispatch<SetStateAction<boolean>>
+  setFocusTool: Dispatch<SetStateAction<boolean>>
 
   // ATTACHMENTS STORE
   chatFiles: ChatFile[]
-  setChatFiles: Dispatch<SetStateAction<ChatFile[]>>
   chatImages: MessageImage[]
-  setChatImages: Dispatch<SetStateAction<MessageImage[]>>
   newMessageFiles: ChatFile[]
-  setNewMessageFiles: Dispatch<SetStateAction<ChatFile[]>>
   newMessageImages: MessageImage[]
-  setNewMessageImages: Dispatch<SetStateAction<MessageImage[]>>
   showFilesDisplay: boolean
+  setChatFiles: Dispatch<SetStateAction<ChatFile[]>>
+  setChatImages: Dispatch<SetStateAction<MessageImage[]>>
+  setNewMessageFiles: Dispatch<SetStateAction<ChatFile[]>>
+  setNewMessageImages: Dispatch<SetStateAction<MessageImage[]>>
   setShowFilesDisplay: Dispatch<SetStateAction<boolean>>
 
   // RETRIEVAL STORE
   useRetrieval: boolean
-  setUseRetrieval: Dispatch<SetStateAction<boolean>>
   sourceCount: number
+  setUseRetrieval: Dispatch<SetStateAction<boolean>>
   setSourceCount: Dispatch<SetStateAction<number>>
 
   // TOOL STORE
@@ -145,31 +129,25 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
 
   // ITEMS STORE
   assistants: [],
-  setAssistants: () => {},
   collections: [],
-  setCollections: () => {},
   chats: [],
-  setChats: () => {},
   files: [],
-  setFiles: () => {},
   folders: [],
-  setFolders: () => {},
-  models: [],
-  setModels: () => {},
   presets: [],
-  setPresets: () => {},
   prompts: [],
-  setPrompts: () => {},
   tools: [],
-  setTools: () => {},
   workspaces: [],
+  setAssistants: () => {},
+  setCollections: () => {},
+  setChats: () => {},
+  setFiles: () => {},
+  setFolders: () => {},
+  setPresets: () => {},
+  setPrompts: () => {},
+  setTools: () => {},
   setWorkspaces: () => {},
 
   // MODELS STORE
-  envKeyMap: {},
-  setEnvKeyMap: () => {},
-  availableHostedModels: [],
-  setAvailableHostedModels: () => {},
   availableLocalModels: [],
   setAvailableLocalModels: () => {},
   availableOpenRouterModels: [],
@@ -178,8 +156,6 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   // WORKSPACE STORE
   selectedWorkspace: null,
   setSelectedWorkspace: () => {},
-  workspaceImages: [],
-  setWorkspaceImages: () => {},
 
   // PRESET STORE
   selectedPreset: null,
@@ -187,74 +163,68 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
 
   // ASSISTANT STORE
   selectedAssistant: null,
-  setSelectedAssistant: () => {},
   assistantImages: [],
-  setAssistantImages: () => {},
   openaiAssistants: [],
+  setSelectedAssistant: () => {},
+  setAssistantImages: () => {},
   setOpenaiAssistants: () => {},
 
   // PASSIVE CHAT STORE
   userInput: "",
-  setUserInput: () => {},
   selectedChat: null,
-  setSelectedChat: () => {},
   chatMessages: [],
-  setChatMessages: () => {},
   chatSettings: null,
-  setChatSettings: () => {},
   chatFileItems: [],
+  setUserInput: () => {},
+  setChatMessages: () => {},
+  setChatSettings: () => {},
+  setSelectedChat: () => {},
   setChatFileItems: () => {},
-
-  // ACTIVE CHAT STORE
-  isGenerating: false,
-  setIsGenerating: () => {},
-  firstTokenReceived: false,
-  setFirstTokenReceived: () => {},
-  abortController: null,
-  setAbortController: () => {},
 
   // CHAT INPUT COMMAND STORE
   isPromptPickerOpen: false,
-  setIsPromptPickerOpen: () => {},
   slashCommand: "",
-  setSlashCommand: () => {},
-  isFilePickerOpen: false,
-  setIsFilePickerOpen: () => {},
-  hashtagCommand: "",
-  setHashtagCommand: () => {},
-  isToolPickerOpen: false,
-  setIsToolPickerOpen: () => {},
-  toolCommand: "",
-  setToolCommand: () => {},
-  focusPrompt: false,
-  setFocusPrompt: () => {},
-  focusFile: false,
-  setFocusFile: () => {},
-  focusTool: false,
-  setFocusTool: () => {},
-  focusAssistant: false,
-  setFocusAssistant: () => {},
+  isAtPickerOpen: false,
   atCommand: "",
+  isToolPickerOpen: false,
+  toolCommand: "",
+  focusPrompt: false,
+  focusFile: false,
+  focusTool: false,
+  setIsPromptPickerOpen: () => {},
+  setSlashCommand: () => {},
+  setIsAtPickerOpen: () => {},
   setAtCommand: () => {},
-  isAssistantPickerOpen: false,
-  setIsAssistantPickerOpen: () => {},
+  setIsToolPickerOpen: () => {},
+  setToolCommand: () => {},
+  setFocusPrompt: () => {},
+  setFocusFile: () => {},
+  setFocusTool: () => {},
+
+  // ACTIVE CHAT STORE
+  isGenerating: false,
+  firstTokenReceived: false,
+  abortController: null,
+  setIsGenerating: () => {},
+  setFirstTokenReceived: () => {},
+  setAbortController: () => {},
 
   // ATTACHMENTS STORE
   chatFiles: [],
-  setChatFiles: () => {},
   chatImages: [],
-  setChatImages: () => {},
   newMessageFiles: [],
-  setNewMessageFiles: () => {},
   newMessageImages: [],
-  setNewMessageImages: () => {},
   showFilesDisplay: false,
+  setChatFiles: () => {},
+  setChatImages: () => {},
+  setNewMessageFiles: () => {},
+  setNewMessageImages: () => {},
   setShowFilesDisplay: () => {},
 
   // RETRIEVAL STORE
   useRetrieval: false,
-  setUseRetrieval: () => {},
   sourceCount: 4,
+  setUseRetrieval: () => {},
   setSourceCount: () => {},
 
   // TOOL STORE

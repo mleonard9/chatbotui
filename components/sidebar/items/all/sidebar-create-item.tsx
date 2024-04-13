@@ -15,7 +15,6 @@ import { createChat } from "@/db/chats"
 import { createCollectionFiles } from "@/db/collection-files"
 import { createCollection } from "@/db/collections"
 import { createFileBasedOnExtension } from "@/db/files"
-import { createModel } from "@/db/models"
 import { createPreset } from "@/db/presets"
 import { createPrompt } from "@/db/prompts"
 import {
@@ -55,8 +54,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     setCollections,
     setAssistants,
     setAssistantImages,
-    setTools,
-    setModels
+    setTools
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -122,7 +120,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       if (image) {
         const filePath = await uploadAssistantImage(createdAssistant, image)
 
-        updatedAssistant = await updateAssistant(createdAssistant.id, {
+        const updatedAssistant = await updateAssistant(createdAssistant.id, {
           image_path: filePath
         })
 
@@ -169,8 +167,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
 
       return updatedAssistant
     },
-    tools: createTool,
-    models: createModel
+    tools: createTool
   }
 
   const stateUpdateFunctions = {
@@ -180,8 +177,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     files: setFiles,
     collections: setCollections,
     assistants: setAssistants,
-    tools: setTools,
-    models: setModels
+    tools: setTools
   }
 
   const handleCreate = async () => {
@@ -218,11 +214,11 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent
-        className="flex min-w-[450px] flex-col justify-between overflow-auto"
+        className="flex min-w-[450px] flex-col justify-between"
         side="left"
         onKeyDown={handleKeyDown}
       >
-        <div className="grow overflow-auto">
+        <div className="grow">
           <SheetHeader>
             <SheetTitle className="text-2xl font-bold">
               Create{" "}

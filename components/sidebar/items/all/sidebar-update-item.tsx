@@ -50,12 +50,6 @@ import {
   updateFile
 } from "@/db/files"
 import {
-  createModelWorkspaces,
-  deleteModelWorkspace,
-  getModelWorkspacesByModelId,
-  updateModel
-} from "@/db/models"
-import {
   createPresetWorkspaces,
   deletePresetWorkspace,
   getPresetWorkspacesByPresetId,
@@ -67,17 +61,13 @@ import {
   getPromptWorkspacesByPromptId,
   updatePrompt
 } from "@/db/prompts"
-import {
-  getAssistantImageFromStorage,
-  uploadAssistantImage
-} from "@/db/storage/assistant-images"
+import { uploadAssistantImage } from "@/db/storage/assistant-images"
 import {
   createToolWorkspaces,
   deleteToolWorkspace,
   getToolWorkspacesByToolId,
   updateTool
 } from "@/db/tools"
-import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { Tables, TablesUpdate } from "@/supabase/types"
 import { CollectionFile, ContentType, DataItemType } from "@/types"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -111,9 +101,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     setFiles,
     setCollections,
     setAssistants,
-    setTools,
-    setModels,
-    setAssistantImages
+    setTools
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -195,8 +183,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       selectedAssistantTools,
       setSelectedAssistantTools
     },
-    tools: null,
-    models: null
+    tools: null
   }
 
   const fetchDataFunctions = {
@@ -225,8 +212,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       setSelectedAssistantCollections([])
       setSelectedAssistantTools([])
     },
-    tools: null,
-    models: null
+    tools: null
   }
 
   const fetchWorkpaceFunctions = {
@@ -253,10 +239,6 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     tools: async (toolId: string) => {
       const item = await getToolWorkspacesByToolId(toolId)
-      return item.workspaces
-    },
-    models: async (modelId: string) => {
-      const item = await getModelWorkspacesByModelId(modelId)
       return item.workspaces
     }
   }
@@ -502,32 +484,10 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
         await deleteAssistantTool(assistantId, tool.id)
       }
 
-      let updatedAssistant = await updateAssistant(assistantId, rest)
+      const updatedAssistant = await updateAssistant(assistantId, rest)
 
       if (image) {
-        const filePath = await uploadAssistantImage(updatedAssistant, image)
-
-        updatedAssistant = await updateAssistant(assistantId, {
-          image_path: filePath
-        })
-
-        const url = (await getAssistantImageFromStorage(filePath)) || ""
-
-        if (url) {
-          const response = await fetch(url)
-          const blob = await response.blob()
-          const base64 = await convertBlobToBase64(blob)
-
-          setAssistantImages(prev => [
-            ...prev,
-            {
-              assistantId: updatedAssistant.id,
-              path: filePath,
-              base64,
-              url
-            }
-          ])
-        }
+        await uploadAssistantImage(updatedAssistant, image)
       }
 
       await handleWorkspaceUpdates(
@@ -554,20 +514,6 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       )
 
       return updatedTool
-    },
-    models: async (modelId: string, updateState: TablesUpdate<"models">) => {
-      const updatedModel = await updateModel(modelId, updateState)
-
-      await handleWorkspaceUpdates(
-        startingWorkspaces,
-        selectedWorkspaces,
-        modelId,
-        deleteModelWorkspace,
-        createModelWorkspaces as any,
-        "model_id"
-      )
-
-      return updatedModel
     }
   }
 
@@ -578,8 +524,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     files: setFiles,
     collections: setCollections,
     assistants: setAssistants,
-    tools: setTools,
-    models: setModels
+    tools: setTools
   }
 
   const handleUpdate = async () => {
@@ -638,12 +583,17 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
         side="left"
         onKeyDown={handleKeyDown}
       >
-        <div className="grow overflow-auto">
+        <div className="grow">
           <SheetHeader>
             <SheetTitle className="text-2xl font-bold">
               Edit {contentType.slice(0, -1)}
             </SheetTitle>
           </SheetHeader>
+
+          {/* TODO */}
+          {/* <div className="absolute right-4 top-4">
+          <ShareMenu item={item} contentType={contentType} />
+        </div> */}
 
           <div className="mt-4 space-y-3">
             {workspaces.length > 1 && (

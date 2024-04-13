@@ -18,7 +18,6 @@ interface ChatItemProps {
 
 export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const {
-    selectedWorkspace,
     selectedChat,
     availableLocalModels,
     assistantImages,
@@ -32,8 +31,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
   const itemRef = useRef<HTMLDivElement>(null)
 
   const handleClick = () => {
-    if (!selectedWorkspace) return
-    return router.push(`/${selectedWorkspace.id}/chat/${chat.id}`)
+    router.push(`/chat/${chat.id}`)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -57,7 +55,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     <div
       ref={itemRef}
       className={cn(
-        "hover:bg-accent focus:bg-accent group flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none",
+        "hover:bg-accent focus:bg-accent flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none",
         isActive && "bg-accent"
       )}
       tabIndex={0}
@@ -67,7 +65,6 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       {chat.assistant_id ? (
         assistantImage ? (
           <Image
-            style={{ width: "30px", height: "30px" }}
             className="rounded"
             src={assistantImage}
             alt="Assistant image"
@@ -76,7 +73,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           />
         ) : (
           <IconRobotFace
-            className="bg-primary text-secondary border-primary rounded border-DEFAULT p-1"
+            className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
             size={30}
           />
         )
@@ -85,7 +82,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           delayDuration={200}
           display={<div>{MODEL_DATA?.modelName}</div>}
           trigger={
-            <ModelIcon provider={MODEL_DATA?.provider} height={30} width={30} />
+            <ModelIcon modelId={MODEL_DATA?.modelId} height={30} width={30} />
           }
         />
       )}
@@ -94,17 +91,19 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
         {chat.name}
       </div>
 
-      <div
-        onClick={e => {
-          e.stopPropagation()
-          e.preventDefault()
-        }}
-        className={`ml-2 flex space-x-2 ${!isActive && "w-11 opacity-0 group-hover:opacity-100"}`}
-      >
-        <UpdateChat chat={chat} />
+      {isActive && (
+        <div
+          onClick={e => {
+            e.stopPropagation()
+            e.preventDefault()
+          }}
+          className="ml-2 flex space-x-2"
+        >
+          <UpdateChat chat={chat} />
 
-        <DeleteChat chat={chat} />
-      </div>
+          <DeleteChat chat={chat} />
+        </div>
+      )}
     </div>
   )
 }

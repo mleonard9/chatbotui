@@ -37,7 +37,3 @@ export const ASSISTANT_PROMPT_MAX = 100000
 // Tools
 export const TOOL_NAME_MAX = 100
 export const TOOL_DESCRIPTION_MAX = 500
-
-// Models
-export const MODEL_NAME_MAX = 100
-export const MODEL_DESCRIPTION_MAX = 500
