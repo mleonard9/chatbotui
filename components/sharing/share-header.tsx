@@ -14,7 +14,7 @@ export const ShareHeader: FC<ShareHeaderProps> = ({ session }) => {
         href="https://www.chatbotui.com"
         className="text-2xl font-bold hover:opacity-50"
       >
-        Matt GPT
+        Chatbot UI
       </Link>
 
       <Link href={session ? "/chat" : "/login"}>

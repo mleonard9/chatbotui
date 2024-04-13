@@ -1,8 +1,8 @@
-# Matt GPT
+# Chatbot UI
 
 The open-source AI chat app for everyone.
 
-<img src="./public/readme/screenshot.png" alt="Matt GPT" width="600">
+<img src="./public/readme/screenshot.png" alt="Chatbot UI" width="600">
 
 ## Demo
 
@@ -10,25 +10,25 @@ View the latest demo [here](https://x.com/mckaywrigley/status/173827324228315177
 
 ## Official Hosted Version
 
-Check back soon for an official hosted version of Matt GPT.
+Check back soon for an official hosted version of Chatbot UI.
 
 ## Official Desktop App
 
-Check back soon for an official desktop app for Matt GPT. Just click download & start chatting - no setup required.
+Check back soon for an official desktop app for Chatbot UI. Just click download & start chatting - no setup required.
 
 ## Support
 
-If you find Matt GPT useful, please consider [sponsoring](https://github.com/sponsors/mckaywrigley) me to support my open-source work :)
+If you find Chatbot UI useful, please consider [sponsoring](https://github.com/sponsors/mckaywrigley) me to support my open-source work :)
 
 ## Legacy Code
 
-Matt GPT was recently updated to its 2.0 version.
+Chatbot UI was recently updated to its 2.0 version.
 
 The code for 1.0 can be found on the `legacy` branch.
 
 ## Updating
 
-In your terminal at the root of your local Matt GPT repository, run:
+In your terminal at the root of your local Chatbot UI repository, run:
 
 ```bash
 npm run update
@@ -36,7 +36,7 @@ npm run update
 
 ## Local Quickstart
 
-Follow these steps to get your own Matt GPT instance running locally.
+Follow these steps to get your own Chatbot UI instance running locally.
 
 You can watch the full video tutorial [here](https://www.youtube.com/watch?v=9Qq3-7-HNgw).
 
@@ -48,7 +48,7 @@ git clone https://github.com/mckaywrigley/chatbot-ui.git
 
 ### 2. Install dependencies
 
-Open a terminal in the root directory of your local Matt GPT repository and run:
+Open a terminal in the root directory of your local Chatbot UI repository and run:
 
 ```bash
 npm install
@@ -89,7 +89,7 @@ scoop install supabase
 
 #### 3. Start Supabase
 
-In your terminal at the root of your local Matt GPT repository, run:
+In your terminal at the root of your local Chatbot UI repository, run:
 
 ```bash
 supabase start
@@ -99,7 +99,7 @@ supabase start
 
 #### 1. Environment variables
 
-In your terminal at the root of your local Matt GPT repository, run:
+In your terminal at the root of your local Chatbot UI repository, run:
 
 ```bash
 cp .env.local.example .env.local
@@ -132,19 +132,19 @@ Follow the instructions [here](https://github.com/jmorganca/ollama#macos).
 
 ### 6. Run app locally
 
-In your terminal at the root of your local Matt GPT repository, run:
+In your terminal at the root of your local Chatbot UI repository, run:
 
 ```bash
 npm run chat
 ```
 
-Your local instance of Matt GPT should now be running at [http://localhost:3000](http://localhost:3000).
+Your local instance of Chatbot UI should now be running at [http://localhost:3000](http://localhost:3000).
 
 You can view your backend GUI at [http://localhost:54323/project/default/editor](http://localhost:54323/project/default/editor).
 
 ## Hosted Quickstart
 
-Follow these steps to get your own Matt GPT instance running in the cloud.
+Follow these steps to get your own Chatbot UI instance running in the cloud.
 
 Video tutorial coming soon.
 
@@ -154,7 +154,7 @@ Repeat steps 1-4 in "Local Quickstart" above.
 
 You will want separate repositories for your local and hosted instances.
 
-Create a new repository for your hosted instance of Matt GPT on GitHub and push your code to it.
+Create a new repository for your hosted instance of Chatbot UI on GitHub and push your code to it.
 
 ### 2. Set up backend with Supabase
 
@@ -192,14 +192,14 @@ We recommend turning off "Confirm email" for your own personal instance.
 
 #### 4. Connect to hosted db
 
-Open up your repository for your hosted instance of Matt GPT.
+Open up your repository for your hosted instance of Chatbot UI.
 
 In the 1st migration file `supabase/migrations/20240108234540_setup.sql` you will need to replace 2 values with the values you got above:
 
 - `project_url` (line 53): Use the `Project URL` value from above
 - `service_role_key` (line 54): Use the `Service role key` value from above
 
-Now, open a terminal in the root directory of your local Matt GPT repository. We will execute a few commands here.
+Now, open a terminal in the root directory of your local Chatbot UI repository. We will execute a few commands here.
 
 Login to Supabase by running:
 
@@ -227,7 +227,7 @@ Your hosted database should now be set up!
 
 Go to [Vercel](https://vercel.com/) and create a new project.
 
-In the setup page, import your GitHub repository for your hosted instance of Matt GPT.
+In the setup page, import your GitHub repository for your hosted instance of Chatbot UI.
 
 In environment variables, add the following from the values you got above:
 
@@ -247,7 +247,7 @@ For the full list of environment variables, refer to the '.env.local.example' fi
 
 Click "Deploy" and wait for your frontend to deploy.
 
-Once deployed, you should be able to use your hosted instance of Matt GPT via the URL Vercel gives you.
+Once deployed, you should be able to use your hosted instance of Chatbot UI via the URL Vercel gives you.
 
 ## Contributing
 

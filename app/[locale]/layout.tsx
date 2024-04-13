@@ -22,8 +22,8 @@ interface RootLayoutProps {
 
 export const metadata: Metadata = {
   title: {
-    template: "%s - Matt GPT",
-    default: "Matt GPT"
+    template: "%s - Chatbot UI",
+    default: "Chatbot UI"
   }
 }
 

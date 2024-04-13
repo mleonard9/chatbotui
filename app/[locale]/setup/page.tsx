@@ -153,7 +153,7 @@ export default function SetupPage() {
           <StepContainer
             stepDescription="Let's create your profile."
             stepNum={currentStep}
-            stepTitle="Welcome to Matt GPT"
+            stepTitle="Welcome to Chatbot UI"
             onShouldProceed={handleShouldProceed}
             showNextButton={!!(displayName && username && usernameAvailable)}
             showBackButton={false}
