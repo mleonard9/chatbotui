@@ -1,11 +1,11 @@
 import { FC } from "react"
 
-interface ChatbotUISVGProps {
+interface MattGPTSVGProps {
   theme: "dark" | "light"
   scale?: number
 }
 
-export const ChatbotUISVG: FC<ChatbotUISVGProps> = ({ theme, scale = 1 }) => {
+export const MattGPTSVG: FC<MattGPTSVGProps> = ({ theme, scale = 1 }) => {
   return (
     <svg
       width={189 * scale}

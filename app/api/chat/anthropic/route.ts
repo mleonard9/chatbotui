@@ -20,6 +20,39 @@ export async function POST(request: Request) {
 
     let ANTHROPIC_FORMATTED_MESSAGES: any = messages.slice(1)
 
+    ANTHROPIC_FORMATTED_MESSAGES = ANTHROPIC_FORMATTED_MESSAGES?.map(
+      (message: any) => {
+        const messageContent =
+          typeof message?.content === "string"
+            ? [message.content]
+            : message?.content
+
+        return {
+          ...message,
+          content: messageContent.map((content: any) => {
+            if (typeof content === "string") {
+              // Handle the case where content is a string
+              return { type: "text", text: content }
+            } else if (
+              content?.type === "image_url" &&
+              content?.image_url?.url?.length
+            ) {
+              return {
+                type: "image",
+                source: {
+                  type: "base64",
+                  media_type: getMediaTypeFromDataURL(content.image_url.url),
+                  data: getBase64FromDataURL(content.image_url.url)
+                }
+              }
+            } else {
+              return content
+            }
+          })
+        }
+      }
+    )
+
     const anthropic = new Anthropic({
       apiKey: profile.anthropic_api_key || ""
     })
