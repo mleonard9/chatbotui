@@ -24,6 +24,11 @@ export const metadata: Metadata = {
   title: {
     template: "%s - MattGPT",
     default: "MattGPT"
+  },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg"
   }
 }
 

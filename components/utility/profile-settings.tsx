@@ -98,28 +98,20 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const [googleGeminiAPIKey, setGoogleGeminiAPIKey] = useState(
     profile?.google_gemini_api_key || ""
   )
-  const [mistralAPIKey, setMistralAPIKey] = useState(
-    profile?.mistral_api_key || ""
-  )
-  const [perplexityAPIKey, setPerplexityAPIKey] = useState(
-    profile?.perplexity_api_key || ""
-  )
-
-  const [openrouterAPIKey, setOpenrouterAPIKey] = useState(
-    profile?.openrouter_api_key || ""
-  )
 
   const [isEnvOpenai, setIsEnvOpenai] = useState(false)
   const [isEnvAnthropic, setIsEnvAnthropic] = useState(false)
   const [isEnvGoogleGemini, setIsEnvGoogleGemini] = useState(false)
-  const [isEnvMistral, setIsEnvMistral] = useState(false)
-  const [isEnvPerplexity, setIsEnvPerplexity] = useState(false)
   const [isEnvAzureOpenai, setIsEnvAzureOpenai] = useState(false)
-  const [isEnvOpenrouter, setIsEnvOpenrouter] = useState(false)
 
   useEffect(() => {
     async function fetchKeys() {
-      const keys = Object.values(VALID_KEYS)
+      const keys = [
+        VALID_KEYS.OPENAI_API_KEY,
+        VALID_KEYS.ANTHROPIC_API_KEY,
+        VALID_KEYS.GOOGLE_GEMINI_API_KEY,
+        VALID_KEYS.AZURE_OPENAI_API_KEY
+      ]
 
       keys.forEach(async key => {
         const response = await fetch("/api/retrieval/keys", {
@@ -145,17 +137,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
             case "GOOGLE_GEMINI_API_KEY":
               setIsEnvGoogleGemini(isUsing)
               break
-            case "MISTRAL_API_KEY":
-              setIsEnvMistral(isUsing)
-              break
-            case "PERPLEXITY_API_KEY":
-              setIsEnvPerplexity(isUsing)
-              break
             case "AZURE_OPENAI_API_KEY":
               setIsEnvAzureOpenai(isUsing)
-              break
-            case "OPENROUTER_API_KEY":
-              setIsEnvOpenrouter(isUsing)
               break
             default:
               console.warn("Unhandled key type:", key)
@@ -199,16 +182,13 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       openai_organization_id: openaiOrgID,
       anthropic_api_key: anthropicAPIKey,
       google_gemini_api_key: googleGeminiAPIKey,
-      mistral_api_key: mistralAPIKey,
-      perplexity_api_key: perplexityAPIKey,
       use_azure_openai: useAzureOpenai,
       azure_openai_api_key: azureOpenaiAPIKey,
       azure_openai_endpoint: azureOpenaiEndpoint,
       azure_openai_35_turbo_id: azureOpenai35TurboID,
       azure_openai_45_turbo_id: azureOpenai45TurboID,
       azure_openai_45_vision_id: azureOpenai45VisionID,
-      azure_openai_embeddings_id: azureEmbeddingsID,
-      openrouter_api_key: openrouterAPIKey
+      azure_openai_embeddings_id: azureEmbeddingsID
     })
     setProfile(updatedProfile)
 
@@ -646,54 +626,6 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                       type="password"
                       value={googleGeminiAPIKey}
                       onChange={e => setGoogleGeminiAPIKey(e.target.value)}
-                    />
-                  </>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                {isEnvMistral ? (
-                  <Label>Mistral API key set by admin.</Label>
-                ) : (
-                  <>
-                    <Label>Mistral API Key</Label>
-                    <Input
-                      placeholder="Mistral API Key"
-                      type="password"
-                      value={mistralAPIKey}
-                      onChange={e => setMistralAPIKey(e.target.value)}
-                    />
-                  </>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                {isEnvPerplexity ? (
-                  <Label>Perplexity API key set by admin.</Label>
-                ) : (
-                  <>
-                    <Label>Perplexity API Key</Label>
-                    <Input
-                      placeholder="Perplexity API Key"
-                      type="password"
-                      value={perplexityAPIKey}
-                      onChange={e => setPerplexityAPIKey(e.target.value)}
-                    />
-                  </>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                {isEnvOpenrouter ? (
-                  <Label>OpenRouter API key set by admin.</Label>
-                ) : (
-                  <>
-                    <Label>OpenRouter API Key</Label>
-                    <Input
-                      placeholder="OpenRouter API Key"
-                      type="password"
-                      value={openrouterAPIKey}
-                      onChange={e => setOpenrouterAPIKey(e.target.value)}
                     />
                   </>
                 )}

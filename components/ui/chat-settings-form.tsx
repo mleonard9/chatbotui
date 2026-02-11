@@ -34,7 +34,7 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
   useAdvancedDropdown = true,
   showTooltip = true
 }) => {
-  const { profile, availableLocalModels } = useContext(ChatbotUIContext)
+  const { profile } = useContext(ChatbotUIContext)
 
   if (!profile) return null
 
@@ -45,7 +45,6 @@ export const ChatSettingsForm: FC<ChatSettingsFormProps> = ({
 
         <ModelSelect
           hostedModelOptions={LLM_LIST}
-          localModelOptions={availableLocalModels}
           selectedModelId={chatSettings.model}
           onSelectModel={model => {
             onChangeChatSettings({ ...chatSettings, model })
@@ -100,22 +99,13 @@ const AdvancedContent: FC<AdvancedContentProps> = ({
   onChangeChatSettings,
   showTooltip
 }) => {
-  const {
-    profile,
-    selectedWorkspace,
-    availableOpenRouterModels,
-    selectedAssistant
-  } = useContext(ChatbotUIContext)
-
-  function findOpenRouterModel(modelId: string) {
-    return availableOpenRouterModels.find(model => model.modelId === modelId)
-  }
+  const { profile, selectedWorkspace, selectedAssistant } =
+    useContext(ChatbotUIContext)
 
   const MODEL_LIMITS = CHAT_SETTING_LIMITS[chatSettings.model] || {
     MIN_TEMPERATURE: 0,
     MAX_TEMPERATURE: 1,
-    MAX_CONTEXT_LENGTH:
-      findOpenRouterModel(chatSettings.model)?.maxContext || 4096
+    MAX_CONTEXT_LENGTH: 4096
   }
 
   return (

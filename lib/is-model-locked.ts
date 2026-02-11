@@ -43,12 +43,6 @@ export const isModelLocked = async (
       return !(isUsing || profile.google_gemini_api_key)
     case "anthropic":
       return !(isUsing || profile.anthropic_api_key)
-    case "mistral":
-      return !(isUsing || profile.mistral_api_key)
-    case "perplexity":
-      return !(isUsing || profile.perplexity_api_key)
-    case "openrouter":
-      return !(isUsing || profile.openrouter_api_key)
     default:
       return false
   }
@@ -58,9 +52,5 @@ export const providerToKeyMap = {
   azure: VALID_KEYS.AZURE_OPENAI_API_KEY,
   openai: VALID_KEYS.OPENAI_API_KEY,
   google: VALID_KEYS.GOOGLE_GEMINI_API_KEY,
-  anthropic: VALID_KEYS.ANTHROPIC_API_KEY,
-  mistral: VALID_KEYS.MISTRAL_API_KEY,
-  perplexity: VALID_KEYS.PERPLEXITY_API_KEY,
-  openrouter: VALID_KEYS.OPENROUTER_API_KEY,
-  ollama: false
+  anthropic: VALID_KEYS.ANTHROPIC_API_KEY
 }

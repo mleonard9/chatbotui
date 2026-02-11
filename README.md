@@ -75,11 +75,7 @@ npm install
    - Run `supabase status` and copy the **Project URL** into `NEXT_PUBLIC_SUPABASE_URL` and the **anon key** into `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Use the **service role key** for `SUPABASE_SERVICE_ROLE_KEY`.
    - In `supabase/migrations/20240108234540_setup.sql` replace the defaults with your values. The defaults use `http://supabase_kong_mattgpt:8000` and the provided service role key. Keep those unless you changed `project_id` in `supabase/config.toml`.
 
-5. **(Optional) Install Ollama**
-
-   Details are available at [https://github.com/jmorganca/ollama#macos](https://github.com/jmorganca/ollama#macos).
-
-6. **Run the app**
+5. **Run the app**
 
 ```bash
 npm run chat

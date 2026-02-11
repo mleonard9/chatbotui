@@ -10,33 +10,28 @@ import {
   DropdownMenuTrigger
 } from "../ui/dropdown-menu"
 import { Input } from "../ui/input"
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ModelIcon } from "./model-icon"
 import { ModelOption } from "./model-option"
 
 interface ModelSelectProps {
   hostedModelOptions: LLM[]
-  localModelOptions: LLM[]
   selectedModelId: string
   onSelectModel: (modelId: LLMID) => void
 }
 
 export const ModelSelect: FC<ModelSelectProps> = ({
   hostedModelOptions,
-  localModelOptions,
   selectedModelId,
   onSelectModel
 }) => {
-  const { profile, availableLocalModels, availableOpenRouterModels } =
-    useContext(ChatbotUIContext)
+  const { profile } = useContext(ChatbotUIContext)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
-  const [tab, setTab] = useState<"hosted" | "local">("hosted")
 
   const [isLocked, setIsLocked] = useState<Boolean>(true)
 
@@ -71,11 +66,10 @@ export const ModelSelect: FC<ModelSelectProps> = ({
     setIsOpen(false)
   }
 
-  const ALL_MODELS = [
-    ...hostedModelOptions,
-    ...localModelOptions,
-    ...availableOpenRouterModels
-  ]
+  const allowedHostedProviders = new Set(["openai", "google", "anthropic"])
+  const ALL_MODELS = hostedModelOptions.filter(model =>
+    allowedHostedProviders.has(model.provider)
+  )
 
   const groupedModels = ALL_MODELS.reduce<Record<string, LLM[]>>(
     (groups, model) => {
@@ -94,10 +88,6 @@ export const ModelSelect: FC<ModelSelectProps> = ({
   )
 
   if (!profile) return null
-
-  const usingLocalModels = availableLocalModels.length > 0
-
-  console.log("test")
 
   return (
     <DropdownMenu
@@ -149,16 +139,6 @@ export const ModelSelect: FC<ModelSelectProps> = ({
         style={{ width: triggerRef.current?.offsetWidth }}
         align="start"
       >
-        <Tabs value={tab} onValueChange={(value: any) => setTab(value)}>
-          {usingLocalModels && (
-            <TabsList defaultValue="hosted" className="grid grid-cols-2">
-              <TabsTrigger value="hosted">Hosted</TabsTrigger>
-
-              <TabsTrigger value="local">Local</TabsTrigger>
-            </TabsList>
-          )}
-        </Tabs>
-
         <Input
           ref={inputRef}
           className="w-full"
@@ -170,11 +150,6 @@ export const ModelSelect: FC<ModelSelectProps> = ({
         <div className="max-h-[300px] overflow-auto">
           {Object.entries(groupedModels).map(([provider, models]) => {
             const filteredModels = models
-              .filter(model => {
-                if (tab === "hosted") return model.provider !== "ollama"
-                if (tab === "local") return model.provider === "ollama"
-                if (tab === "openrouter") return model.provider === "openrouter"
-              })
               .filter(model =>
                 model.modelName.toLowerCase().includes(search.toLowerCase())
               )

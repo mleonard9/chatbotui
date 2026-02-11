@@ -22,15 +22,12 @@ import {
   ChatFile,
   ChatMessage,
   ChatSettings,
-  LLM,
   LLMID,
-  MessageImage,
-  OpenRouterLLM
+  MessageImage
 } from "@/types"
 import { AssistantImage } from "@/types/assistant-image"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useState } from "react"
-import { toast } from "sonner"
 
 interface GlobalStateProps {
   children: React.ReactNode
@@ -52,12 +49,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [prompts, setPrompts] = useState<Tables<"prompts">[]>([])
   const [tools, setTools] = useState<Tables<"tools">[]>([])
   const [workspaces, setWorkspaces] = useState<Tables<"workspaces">[]>([])
-
-  // MODELS STORE
-  const [availableLocalModels, setAvailableLocalModels] = useState<LLM[]>([])
-  const [availableOpenRouterModels, setAvailableOpenRouterModels] = useState<
-    OpenRouterLLM[]
-  >([])
 
   // WORKSPACE STORE
   const [selectedWorkspace, setSelectedWorkspace] =
@@ -124,11 +115,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
-    fetchOpenRouterModels()
-
-    if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
-      fetchOllamaModels()
-    }
+    resetUnusedModelSources()
 
     // fetchOpenaiAssistants()
 
@@ -266,73 +253,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     setLoading(false)
   }
 
-  const fetchOllamaModels = async () => {
-    setLoading(true)
-
-    try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags"
-      )
-
-      if (!response.ok) {
-        throw new Error(`Ollama server is not responding.`)
-      }
-
-      const data = await response.json()
-
-      const localModels = data.models.map((model: any) => ({
-        modelId: model.name as LLMID,
-        modelName: model.name,
-        provider: "ollama",
-        hostedId: model.name,
-        platformLink: "https://ollama.ai/library",
-        imageInput: false
-      }))
-
-      setAvailableLocalModels(localModels)
-    } catch (error) {
-      console.warn("Error fetching Ollama models: " + error)
-    }
-
-    setLoading(false)
-  }
-
-  const fetchOpenRouterModels = async () => {
-    setLoading(true)
-
-    try {
-      const response = await fetch("https://openrouter.ai/api/v1/models")
-
-      if (!response.ok) {
-        throw new Error(`OpenRouter server is not responding.`)
-      }
-
-      const { data } = await response.json()
-
-      const openRouterModels = data.map(
-        (model: {
-          id: string
-          name: string
-          context_length: number
-        }): OpenRouterLLM => ({
-          modelId: model.id as LLMID,
-          modelName: model.id,
-          provider: "openrouter",
-          hostedId: model.name,
-          platformLink: "https://openrouter.dev",
-          imageInput: false,
-          maxContext: model.context_length
-        })
-      )
-
-      setAvailableOpenRouterModels(openRouterModels)
-    } catch (error) {
-      console.error("Error fetching Open Router models: " + error)
-      toast.error("Error fetching Open Router models: " + error)
-    }
-
-    setLoading(false)
-  }
+  const resetUnusedModelSources = async () => {}
 
   const fetchOpenaiAssistants = async () => {
     setLoading(true)
@@ -380,12 +301,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setPrompts,
         setTools,
         setWorkspaces,
-
-        // MODELS STORE
-        availableLocalModels,
-        setAvailableLocalModels,
-        availableOpenRouterModels,
-        setAvailableOpenRouterModels,
 
         // WORKSPACE STORE
         selectedWorkspace,

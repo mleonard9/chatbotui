@@ -6,13 +6,13 @@ import { Tables } from "@/supabase/types"
 import { ChatMessage, ChatPayload, LLMID } from "@/types"
 import { useRouter } from "next/navigation"
 import { useContext, useRef } from "react"
+import { toast } from "sonner"
 import { LLM_LIST } from "../../../lib/models/llm/llm-list"
 import {
   createTempMessages,
   handleCreateChat,
   handleCreateMessages,
   handleHostedChat,
-  handleLocalChat,
   handleRetrieval,
   processResponse,
   validateChatSettings
@@ -35,8 +35,6 @@ export const useChatHandler = () => {
     setSelectedChat,
     setChats,
     setSelectedTools,
-    availableLocalModels,
-    availableOpenRouterModels,
     abortController,
     setAbortController,
     chatSettings,
@@ -156,11 +154,9 @@ export const useChatHandler = () => {
       const newAbortController = new AbortController()
       setAbortController(newAbortController)
 
-      const modelData = [
-        ...LLM_LIST,
-        ...availableLocalModels,
-        ...availableOpenRouterModels
-      ].find(llm => llm.modelId === chatSettings?.model)
+      const modelData = LLM_LIST.find(
+        llm => llm.modelId === chatSettings?.model
+      )
 
       validateChatSettings(
         chatSettings,
@@ -249,35 +245,20 @@ export const useChatHandler = () => {
           setToolInUse
         )
       } else {
-        if (modelData!.provider === "ollama") {
-          generatedText = await handleLocalChat(
-            payload,
-            profile!,
-            chatSettings!,
-            tempAssistantChatMessage,
-            isRegeneration,
-            newAbortController,
-            setIsGenerating,
-            setFirstTokenReceived,
-            setChatMessages,
-            setToolInUse
-          )
-        } else {
-          generatedText = await handleHostedChat(
-            payload,
-            profile!,
-            modelData!,
-            tempAssistantChatMessage,
-            isRegeneration,
-            newAbortController,
-            newMessageImages,
-            chatImages,
-            setIsGenerating,
-            setFirstTokenReceived,
-            setChatMessages,
-            setToolInUse
-          )
-        }
+        generatedText = await handleHostedChat(
+          payload,
+          profile!,
+          modelData!,
+          tempAssistantChatMessage,
+          isRegeneration,
+          newAbortController,
+          newMessageImages,
+          chatImages,
+          setIsGenerating,
+          setFirstTokenReceived,
+          setChatMessages,
+          setToolInUse
+        )
       }
 
       if (!currentChat) {
@@ -323,7 +304,8 @@ export const useChatHandler = () => {
 
       setIsGenerating(false)
       setFirstTokenReceived(false)
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error?.message || "Unable to send message with this model.")
       setIsGenerating(false)
       setFirstTokenReceived(false)
       setUserInput(startingInput)

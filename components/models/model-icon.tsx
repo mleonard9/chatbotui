@@ -1,11 +1,7 @@
 import { cn } from "@/lib/utils"
-import meta from "@/public/providers/meta.png"
-import mistral from "@/public/providers/mistral.png"
-import perplexity from "@/public/providers/perplexity.png"
 import { LLMID } from "@/types"
 import { IconSparkles } from "@tabler/icons-react"
 import { useTheme } from "next-themes"
-import Image from "next/image"
 import { FC, HTMLAttributes } from "react"
 import { AnthropicSVG } from "../icons/anthropic-svg"
 import { GoogleSVG } from "../icons/google-svg"
@@ -43,36 +39,6 @@ export const ModelIcon: FC<ModelIconProps> = ({
           height={height}
         />
       )
-    case "llama2-7b":
-    case "llama2-70b":
-      return (
-        <Image
-          className={cn(
-            "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-[1px] border-black"
-          )}
-          style={{ objectFit: "cover" }}
-          src={meta.src}
-          alt="Mistral"
-          width={width}
-          height={height}
-        />
-      )
-    case "mistral-tiny":
-    case "mistral-small":
-    case "mistral-medium":
-      return (
-        <Image
-          className={cn(
-            "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-[1px] border-black"
-          )}
-          src={mistral.src}
-          alt="Mistral"
-          width={width}
-          height={height}
-        />
-      )
     case "claude-2.1":
     case "claude-instant-1.2":
     case "claude-3-haiku-20240307":
@@ -104,51 +70,7 @@ export const ModelIcon: FC<ModelIconProps> = ({
           height={height}
         />
       )
-    case "pplx-7b-online":
-    case "pplx-70b-online":
-      return (
-        <Image
-          className={cn(
-            "rounded-sm p-1",
-            theme === "dark" ? "bg-white" : "border-[1px] border-black"
-          )}
-          src={perplexity.src}
-          alt="Mistral"
-          width={width}
-          height={height}
-        />
-      )
     default:
-      if (!modelId || modelId.includes("/")) {
-        return <IconSparkles size={width} />
-      } else if (modelId.includes("llama")) {
-        return (
-          <Image
-            className={cn(
-              "rounded-sm p-1",
-              theme === "dark" ? "bg-white" : "border-[1px] border-black"
-            )}
-            src={meta.src}
-            alt="Mistral"
-            width={width}
-            height={height}
-          />
-        )
-      } else if (modelId.includes("mistral") || modelId.includes("mixtral")) {
-        return (
-          <Image
-            className={cn(
-              "rounded-sm p-1",
-              theme === "dark" ? "bg-white" : "border-[1px] border-black"
-            )}
-            src={mistral.src}
-            alt="Mistral"
-            width={width}
-            height={height}
-          />
-        )
-      } else {
-        return <IconSparkles size={width} />
-      }
+      return <IconSparkles size={width} />
   }
 }
