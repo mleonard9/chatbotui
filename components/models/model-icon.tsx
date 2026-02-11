@@ -26,9 +26,12 @@ export const ModelIcon: FC<ModelIconProps> = ({
   const { theme } = useTheme()
 
   switch (modelId as string) {
-    case "gpt-4-1106-preview":
-    case "gpt-4-vision-preview":
-    case "gpt-3.5-turbo-1106":
+    case "gpt-5.2":
+    case "gpt-4.1":
+    case "gpt-4.1-mini":
+    case "gpt-4o":
+    case "gpt-4o-mini":
+    case "o3-mini":
       return (
         <OpenAISVG
           className={cn(
@@ -72,6 +75,10 @@ export const ModelIcon: FC<ModelIconProps> = ({
       )
     case "claude-2.1":
     case "claude-instant-1.2":
+    case "claude-3-haiku-20240307":
+    case "claude-3-sonnet-20240229":
+    case "claude-3-opus-20240229":
+    case "claude-3-5-sonnet-20240620":
       return (
         <AnthropicSVG
           className={cn(
@@ -83,8 +90,9 @@ export const ModelIcon: FC<ModelIconProps> = ({
           height={height}
         />
       )
-    case "gemini-pro":
-    case "gemini-pro-vision":
+    case "gemini-2.0-flash":
+    case "gemini-2.5-flash-preview-04-17":
+    case "gemini-2.5-pro-preview-05-06":
       return (
         <GoogleSVG
           className={cn(

@@ -32,8 +32,7 @@ export async function POST(request: Request) {
       messages: messages as ChatCompletionCreateParamsBase["messages"],
       temperature: chatSettings.temperature,
       max_tokens:
-        chatSettings.model === "gpt-4-vision-preview" ||
-        chatSettings.model === "gpt-4o"
+        chatSettings.model === "gpt-4.1" || chatSettings.model === "gpt-4o"
           ? 4096
           : CHAT_SETTING_LIMITS[chatSettings.model]?.MAX_TOKEN_OUTPUT_LENGTH ||
             4096,

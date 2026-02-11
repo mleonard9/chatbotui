@@ -77,7 +77,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [userInput, setUserInput] = useState<string>("")
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatSettings, setChatSettings] = useState<ChatSettings>({
-    model: "gpt-4-1106-preview",
+    model: "gpt-4o",
     prompt: "You are a helpful AI assistant.",
     temperature: 0.5,
     contextLength: 4000,
@@ -186,7 +186,7 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
       setSelectedWorkspace(homeWorkspace!)
 
       setChatSettings({
-        model: (homeWorkspace?.default_model || "gpt-4-1106-preview") as LLMID,
+        model: (homeWorkspace?.default_model || "gpt-4o") as LLMID,
         prompt:
           homeWorkspace?.default_prompt ||
           "You are a friendly, helpful AI assistant.",
