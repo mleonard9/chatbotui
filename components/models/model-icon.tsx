@@ -91,8 +91,8 @@ export const ModelIcon: FC<ModelIconProps> = ({
         />
       )
     case "gemini-2.0-flash":
-    case "gemini-2.5-flash-preview-04-17":
-    case "gemini-2.5-pro-preview-05-06":
+    case "gemini-2.5-flash":
+    case "gemini-2.5-pro":
       return (
         <GoogleSVG
           className={cn(

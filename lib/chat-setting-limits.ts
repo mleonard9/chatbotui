@@ -53,13 +53,13 @@ export const CHAT_SETTING_LIMITS: Record<LLMID, ChatSettingLimits> = {
     MAX_TOKEN_OUTPUT_LENGTH: 8192,
     MAX_CONTEXT_LENGTH: 1048576
   },
-  "gemini-2.5-flash-preview-04-17": {
+  "gemini-2.5-flash": {
     MIN_TEMPERATURE: 0.0,
     MAX_TEMPERATURE: 2.0,
     MAX_TOKEN_OUTPUT_LENGTH: 65536,
     MAX_CONTEXT_LENGTH: 1048576
   },
-  "gemini-2.5-pro-preview-05-06": {
+  "gemini-2.5-pro": {
     MIN_TEMPERATURE: 0.0,
     MAX_TEMPERATURE: 2.0,
     MAX_TOKEN_OUTPUT_LENGTH: 65536,
