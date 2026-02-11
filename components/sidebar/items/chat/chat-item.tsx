@@ -45,7 +45,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     ...LLM_LIST,
     ...availableLocalModels,
     ...availableOpenRouterModels
-  ].find(llm => llm.modelId === chat.model) as LLM
+  ].find(llm => llm.modelId === chat.model)
 
   const assistantImage = assistantImages.find(
     image => image.assistantId === chat.assistant_id
@@ -80,9 +80,13 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
       ) : (
         <WithTooltip
           delayDuration={200}
-          display={<div>{MODEL_DATA?.modelName}</div>}
+          display={<div>{MODEL_DATA?.modelName || chat.model}</div>}
           trigger={
-            <ModelIcon modelId={MODEL_DATA?.modelId} height={30} width={30} />
+            <ModelIcon
+              modelId={MODEL_DATA?.modelId || chat.model}
+              height={30}
+              width={30}
+            />
           }
         />
       )}

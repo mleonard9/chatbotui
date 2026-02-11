@@ -1,5 +1,5 @@
+import { SubmitButton } from "@/components/login/submit-button"
 import { Brand } from "@/components/ui/brand"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/lib/supabase/server"
@@ -59,6 +59,7 @@ export default async function Login({
   const signUp = async (formData: FormData) => {
     "use server"
 
+    const origin = headers().get("origin")
     const email = formData.get("email") as string
     const password = formData.get("password") as string
     const cookieStore = cookies()
@@ -68,8 +69,7 @@ export default async function Login({
       email,
       password,
       options: {
-        // USE IF YOU WANT TO SEND EMAIL VERIFICATION, ALSO CHANGE TOML FILE
-        // emailRedirectTo: `${origin}/auth/callback`
+        emailRedirectTo: `${origin}/auth/callback`
       }
     })
 
@@ -78,10 +78,7 @@ export default async function Login({
       return redirect(`/login?message=${error.message}`)
     }
 
-    return redirect("/setup")
-
-    // USE IF YOU WANT TO SEND EMAIL VERIFICATION, ALSO CHANGE TOML FILE
-    // return redirect("/login?message=Check email to continue sign in process")
+    return redirect("/login?message=Check email to continue sign in process")
   }
 
   const handleResetPassword = async (formData: FormData) => {
@@ -131,16 +128,20 @@ export default async function Login({
           placeholder="••••••••"
         />
 
-        <Button className="mb-2 rounded-md bg-blue-700 px-4 py-2 text-white">
+        <SubmitButton
+          className="mb-2 rounded-md bg-blue-700 px-4 py-2 text-white"
+          pendingText="Logging in..."
+        >
           Login
-        </Button>
+        </SubmitButton>
 
-        <Button
+        {/* <SubmitButton
           formAction={signUp}
           className="border-foreground/20 mb-2 rounded-md border px-4 py-2"
+          pendingText="Signing up..."
         >
           Sign Up
-        </Button>
+        </SubmitButton> */}
 
         <div className="text-muted-foreground mt-1 flex justify-center text-sm">
           <span className="mr-1">Forgot your password?</span>

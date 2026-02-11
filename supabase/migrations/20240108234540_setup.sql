@@ -2,7 +2,7 @@
 create extension http with schema extensions;
 
 -- Enable vector extension
-create extension vector with schema extensions;
+create extension vector with schema public;
 
 -- Function to update modified column
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -50,8 +50,8 @@ LANGUAGE 'plpgsql'
 SECURITY DEFINER
 AS $$
 DECLARE
-  project_url TEXT := 'https://szmsfktitcghvqxgende.supabase.co';
-  service_role_key TEXT := 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6bXNma3RpdGNnaHZxeGdlbmRlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwNTc3MDg5OSwiZXhwIjoyMDIxMzQ2ODk5fQ.cpr54U8rUVqH2IPlI65qqNpfi5hb5o5YnBzqCTgC58I'; -- full access needed for http request to storage
+  project_url TEXT := 'https://ciaksayolopmhdamvaza.supabase.co';
+  service_role_key TEXT := 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpYWtzYXlvbG9wbWhkYW12YXphIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDgzMjM5MiwiZXhwIjoyMDg2NDA4MzkyfQ.nmPQLBlDvQgUEcdgwUBpx6DL-IdcYCsQVUhS1oBIwv8'; -- full access needed for http request to storage
   url TEXT := project_url || '/storage/v1/object/' || bucket || '/' || object;
 BEGIN
   SELECT

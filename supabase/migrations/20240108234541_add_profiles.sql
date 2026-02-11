@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS profiles (
     -- ID
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- RELATIONSHIPS
     user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -152,7 +152,7 @@ EXECUTE PROCEDURE delete_old_profile_image();
 
 -- STORAGE --
 
-INSERT INTO storage.buckets (id, name, public) VALUES ('profile_images', 'profile_images', true);
+INSERT INTO storage.buckets (id, name, public) VALUES ('profile_images', 'profile_images', true) ON CONFLICT DO NOTHING;
 
 CREATE POLICY "Allow public read access on profile images"
     ON storage.objects FOR SELECT

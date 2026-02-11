@@ -13,3 +13,11 @@ export function formatDate(input: string | number | Date): string {
     year: "numeric"
   })
 }
+
+export const getBase64FromDataURL = (dataURL: string) => {
+  return dataURL.split(",")[1]
+}
+
+export const getMediaTypeFromDataURL = (dataURL: string) => {
+  return dataURL.split(",")[0].split(":")[1].split(";")[0]
+}

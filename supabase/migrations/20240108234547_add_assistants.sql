@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS assistants (
     -- ID
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- REQUIRED RELATIONSHIPS
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -91,7 +91,7 @@ EXECUTE PROCEDURE delete_old_assistant_image();
 
 -- STORAGE --
 
-INSERT INTO storage.buckets (id, name, public) VALUES ('assistant_images', 'assistant_images', false);
+INSERT INTO storage.buckets (id, name, public) VALUES ('assistant_images', 'assistant_images', false) ON CONFLICT DO NOTHING;
 
 CREATE OR REPLACE FUNCTION public.non_private_assistant_exists(p_name text)
 RETURNS boolean

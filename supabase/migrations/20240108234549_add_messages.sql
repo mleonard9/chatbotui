@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS messages (
     -- ID
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- RELATIONSHIPS
     chat_id UUID NOT NULL REFERENCES chats(id) ON DELETE CASCADE,
@@ -104,7 +104,7 @@ EXECUTE PROCEDURE delete_old_message_images();
 
 -- MESSAGE IMAGES
 
-INSERT INTO storage.buckets (id, name, public) VALUES ('message_images', 'message_images', false);
+INSERT INTO storage.buckets (id, name, public) VALUES ('message_images', 'message_images', false) ON CONFLICT DO NOTHING;
 
 CREATE POLICY "Allow read access to own message images"
     ON storage.objects FOR SELECT

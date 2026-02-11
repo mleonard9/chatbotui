@@ -708,9 +708,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
             <WithTooltip
               display={
-                <div>
-                  Download MattGPT data as JSON. Import coming soon!
-                </div>
+                <div>Download MattGPT data as JSON. Import coming soon!</div>
               }
               trigger={
                 <IconFileDownload

@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS files (
     -- ID
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     -- REQUIRED RELATIONSHIPS
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -87,7 +87,7 @@ EXECUTE PROCEDURE delete_old_file();
 
 -- STORAGE --
 
-INSERT INTO storage.buckets (id, name, public) VALUES ('files', 'files', false);
+INSERT INTO storage.buckets (id, name, public) VALUES ('files', 'files', false) ON CONFLICT DO NOTHING;
 
 CREATE OR REPLACE FUNCTION public.non_private_file_exists(p_name text)
 RETURNS boolean

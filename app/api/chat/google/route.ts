@@ -44,9 +44,10 @@ export async function POST(request: Request) {
     return new Response(readableStream, {
       headers: { "Content-Type": "text/plain" }
     })
-
   } catch (error: any) {
-    const errorMessage = error.error?.message || "An unexpected error occurred"
+    console.error("Google API error:", error)
+    const errorMessage =
+      error.error?.message || error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {
       status: errorCode

@@ -111,11 +111,11 @@ export const ShareChat: FC<ShareChatProps> = ({
               <WithTooltip
                 delayDuration={!user?.id ? 0 : 1000}
                 display={
-                <div>
+                  <div>
                     {!user?.id
                       ? `Sign up for MattGPT to continue this chat.`
                       : "Continue this chat in a workspace."}
-                </div>
+                  </div>
                 }
                 trigger={
                   <Button disabled={!user?.id}>

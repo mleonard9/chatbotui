@@ -121,7 +121,7 @@ export const Message: FC<MessageProps> = ({
     ...LLM_LIST,
     ...availableLocalModels,
     ...availableOpenRouterModels
-  ].find(llm => llm.modelId === message.model) as LLM
+  ].find(llm => llm.modelId === message.model)
 
   const selectedAssistantImage = assistantImages.find(
     image => image.path === selectedAssistant?.image_path
@@ -179,7 +179,9 @@ export const Message: FC<MessageProps> = ({
                   )
                 ) : (
                   <WithTooltip
-                    display={<div>{MODEL_DATA.modelName}</div>}
+                    display={
+                      <div>{MODEL_DATA?.modelName || message.model}</div>
+                    }
                     trigger={
                       <ModelIcon
                         modelId={message.model as LLMID}
